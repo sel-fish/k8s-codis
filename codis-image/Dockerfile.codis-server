@@ -1,0 +1,13 @@
+FROM hub.c.163.com/dwyane/debian-ssh:jessie
+MAINTAINER fenqi <fenqi@meili-inc.com>
+
+RUN echo "\
+[program:kvstore-config-server]\n\
+command=/root/run_config_server.sh\n\
+startsecs=10\n\
+startretries=10\n\
+stderr_logfile=/root/kvstore/config/supervisor-err.log\n\
+stdout_logfile=/root/kvstore/config/supervisor-out.log\n\
+stopsignal=TERM\n\
+stopwaitsecs=10\n\
+" >> /etc/supervisor/conf.d/meili-inc.conf
