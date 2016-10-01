@@ -1,4 +1,29 @@
 FROM hub.c.163.com/dwyane/debian-ssh:jessie
 MAINTAINER fenqi <fenqi@meili-inc.com>
 
+ENV CODIS_DIR /opt/codis
 
+ADD bin/codis-proxy $CODIS_DIR/codis-proxy
+ADD conf/codis-config.jinja /root/
+ADD bin/renderConfigFile.py /root/
+ADD bin/run_codis_component.sh /root/
+
+# Expose Codis Proxy port.
+#
+# 19000 api port
+# 11000 http port
+EXPOSE 19000 11000
+
+RUN echo "\
+[program:codis-proxy]\n\
+command=/root/run_codis_component.sh proxy\n\
+startsecs=10\n\
+startretries=10\n\
+stderr_logfile=$CODIS_DIR/supervisor-err.log\n\
+stdout_logfile=$CODIS_DIR/supervisor-out.log\n\
+stopsignal=TERM\n\
+stopwaitsecs=10\n\
+" >> /etc/supervisor/conf.d/meili-inc.conf
+
+# Define working directory.
+WORKDIR $CODIS_DIR

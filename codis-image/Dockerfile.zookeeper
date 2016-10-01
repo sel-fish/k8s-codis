@@ -1,1 +1,23 @@
-# https://github.com/jplock/docker-zookeeper/blob/master/Dockerfile
+# copy from https://github.com/jplock/docker-zookeeper/blob/master/Dockerfile
+
+FROM openjdk:8
+MAINTAINER Justin Plock <justin@plock.net>
+
+ARG VERSION=3.4.5-cdh5.7.0
+
+LABEL name="zookeeper" version=$VERSION
+
+ADD zookeeper-$VERSION.tar.gz /opt/
+
+RUN mv /opt/zookeeper-$VERSION /opt/zookeeper \
+    && cp /opt/zookeeper/conf/zoo_sample.cfg /opt/zookeeper/conf/zoo.cfg \
+    && mkdir -p /tmp/zookeeper
+
+EXPOSE 2181 2888 3888
+
+WORKDIR /opt/zookeeper
+
+# VOLUME ["/opt/zookeeper/conf", "/tmp/zookeeper"]
+
+ENTRYPOINT ["/opt/zookeeper/bin/zkServer.sh"]
+CMD ["start-foreground"]

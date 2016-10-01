@@ -4,11 +4,12 @@ MAINTAINER fenqi <fenqi@meili-inc.com>
 ENV CODIS_DIR /opt/codis
 
 ADD bin/codis-config $CODIS_DIR/codis-config
+ADD bin/assets $CODIS_DIR/assets
 ADD conf/codis-config.jinja /root/
 ADD bin/renderConfigFile.py /root/
 ADD bin/run_codis_component.sh /root/
 
-# Expose Dashboard port.
+# Expose Codis Dashboard port.
 EXPOSE 18087
 
 RUN echo "\
