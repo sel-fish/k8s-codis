@@ -1,4 +1,26 @@
 FROM hub.c.163.com/dwyane/debian-ssh:jessie
 MAINTAINER fenqi <fenqi@meili-inc.com>
 
+ENV CODIS_DIR /opt/codis
 
+ADD bin/codis-config $CODIS_DIR/codis-config
+ADD conf/codis-config.jinja /root/
+ADD bin/renderConfigFile.py /root/
+ADD bin/run_codis_component.sh /root/
+
+# Expose Dashboard port.
+EXPOSE 18087
+
+RUN echo "\
+[program:codis-dashboard]\n\
+command=/root/run_codis_component.sh dashboard\n\
+startsecs=10\n\
+startretries=10\n\
+stderr_logfile=$CODIS_DIR/supervisor-err.log\n\
+stdout_logfile=$CODIS_DIR/supervisor-out.log\n\
+stopsignal=TERM\n\
+stopwaitsecs=10\n\
+" >> /etc/supervisor/conf.d/meili-inc.conf
+
+# Define working directory.
+WORKDIR $CODIS_DIR
