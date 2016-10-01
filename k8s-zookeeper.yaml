@@ -15,6 +15,8 @@ kind: Service
 metadata:
   name: zookeeper-1
   namespace: fenqi-codis
+  labels:
+      name: zookeeper-1
 spec:
   ports:
     - name: client
@@ -32,6 +34,8 @@ kind: Service
 metadata:
   name: zookeeper-2
   namespace: fenqi-codis
+  labels:
+      name: zookeeper-2
 spec:
   ports:
     - name: client
@@ -49,6 +53,8 @@ kind: Service
 metadata:
   name: zookeeper-3
   namespace: fenqi-codis
+  labels:
+      name: zookeeper-3
 spec:
   ports:
     - name: client
@@ -75,30 +81,29 @@ spec:
         server-id: "1"
     spec:
       volumes:
-        - name: data
-          emptyDir: {}
-        - name: wal
-          emptyDir:
-            medium: Memory
+        - hostPath:
+            path: /tmp/zookeeper/data1
+          name: data
+        - hostPath:
+            path: /tmp/zookeeper/log1
+          name: log
       containers:
         - name: server
           image: hub.c.163.com/dwyane/zookeeper:3.4.5-cdh5.7.0
           env:
-            - name: MYID
+            - name: SERVER_ID
               value: "1"
-            - name: SERVERS
-              value: "zookeeper-1,zookeeper-2,zookeeper-3"
-            - name: JVMFLAGS
-              value: "-Xmx2G"
+            - name: MAX_SERVERS
+              value: "3"
           ports:
             - containerPort: 2181
             - containerPort: 2888
             - containerPort: 3888
           volumeMounts:
-            - mountPath: /zookeeper/data
+            - mountPath: /opt/zookeeper/data
               name: data
-            - mountPath: /zookeeper/wal
-              name: wal
+            - mountPath: /opt/zookeeper/log
+              name: log
 ---
 apiVersion: v1
 kind: ReplicationController
@@ -114,30 +119,29 @@ spec:
         server-id: "2"
     spec:
       volumes:
-        - name: data
-          emptyDir: {}
-        - name: wal
-          emptyDir:
-            medium: Memory
+        - hostPath:
+            path: /tmp/zookeeper/data2
+          name: data
+        - hostPath:
+            path: /tmp/zookeeper/log2
+          name: log
       containers:
         - name: server
           image: hub.c.163.com/dwyane/zookeeper:3.4.5-cdh5.7.0
           env:
-            - name: MYID
+            - name: SERVER_ID
               value: "2"
-            - name: SERVERS
-              value: "zookeeper-1,zookeeper-2,zookeeper-3"
-            - name: JVMFLAGS
-              value: "-Xmx2G"
+            - name: MAX_SERVERS
+              value: "3"
           ports:
             - containerPort: 2181
             - containerPort: 2888
             - containerPort: 3888
           volumeMounts:
-            - mountPath: /zookeeper/data
+            - mountPath: /opt/zookeeper/data
               name: data
-            - mountPath: /zookeeper/wal
-              name: wal
+            - mountPath: /opt/zookeeper/log
+              name: log
 ---
 apiVersion: v1
 kind: ReplicationController
@@ -153,27 +157,26 @@ spec:
         server-id: "3"
     spec:
       volumes:
-        - name: data
-          emptyDir: {}
-        - name: wal
-          emptyDir:
-            medium: Memory
+        - hostPath:
+            path: /tmp/zookeeper/data3
+          name: data
+        - hostPath:
+            path: /tmp/zookeeper/log3
+          name: log
       containers:
         - name: server
           image: hub.c.163.com/dwyane/zookeeper:3.4.5-cdh5.7.0
           env:
-            - name: MYID
+            - name: SERVER_ID
               value: "3"
-            - name: SERVERS
-              value: "zookeeper-1,zookeeper-2,zookeeper-3"
-            - name: JVMFLAGS
-              value: "-Xmx2G"
+            - name: MAX_SERVERS
+              value: "3"
           ports:
             - containerPort: 2181
             - containerPort: 2888
             - containerPort: 3888
           volumeMounts:
-            - mountPath: /zookeeper/data
+            - mountPath: /opt/zookeeper/data
               name: data
-            - mountPath: /zookeeper/wal
-              name: wal
+            - mountPath: /opt/zookeeper/log
+              name: log
