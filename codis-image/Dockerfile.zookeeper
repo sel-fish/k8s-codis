@@ -1,6 +1,7 @@
 # copy from https://github.com/jplock/docker-zookeeper/blob/master/Dockerfile
+# get https://archive.cloudera.com/cdh5/cdh/5/zookeeper-3.4.5-cdh5.7.0.tar.gz to local first
 
-FROM openjdk:8
+FROM hub.c.163.com/dwyane/openjdk:8
 MAINTAINER Justin Plock <justin@plock.net>
 
 ARG VERSION=3.4.5-cdh5.7.0
