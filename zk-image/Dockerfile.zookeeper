@@ -1,4 +1,6 @@
-# copy from https://github.com/jplock/docker-zookeeper/blob/master/Dockerfile
+# references:
+# - https://github.com/jplock/docker-zookeeper/blob/master/Dockerfile
+# - https://github.com/fabric8io/fabric8-zookeeper-docker
 # get https://archive.cloudera.com/cdh5/cdh/5/zookeeper-3.4.5-cdh5.7.0.tar.gz to local first
 
 FROM hub.c.163.com/dwyane/openjdk:8
@@ -12,13 +14,14 @@ ADD zookeeper-$VERSION.tar.gz /opt/
 
 RUN mv /opt/zookeeper-$VERSION /opt/zookeeper \
     && cp /opt/zookeeper/conf/zoo_sample.cfg /opt/zookeeper/conf/zoo.cfg \
-    && mkdir -p /tmp/zookeeper
+    && mkdir -p /opt/zookeeper/{data,log}
 
 EXPOSE 2181 2888 3888
 
 WORKDIR /opt/zookeeper
+VOLUME ["/opt/zookeeper/conf", "/opt/zookeeper/data", "/opt/zookeeper/log"]
 
-# VOLUME ["/opt/zookeeper/conf", "/tmp/zookeeper"]
+COPY config-and-run.sh ./bin/
+COPY zoo.cfg ./conf/
 
-ENTRYPOINT ["/opt/zookeeper/bin/zkServer.sh"]
-CMD ["start-foreground"]
+CMD ["/opt/zookeeper/bin/config-and-run.sh"]
