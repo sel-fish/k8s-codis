@@ -20,13 +20,12 @@ metadata:
   namespace: fenqi-codis 
 spec:
   ports:
-    - name: redis
+    - name: server
       port: 6379
       targetPort: 6379
   type: NodePort
   selector:
     name: codis-server
-    group: "1"
     product: "test"
 ---
 apiVersion: v1
@@ -81,7 +80,7 @@ metadata:
   name: codis-server
   namespace: fenqi-codis 
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -89,16 +88,15 @@ spec:
         product: "test"
     spec:
       containers:
-        - name: codis-server
+        - name: server
+          image: hub.c.163.com/dwyane/codis-server:2.0
+          ports:
+             - containerPort: 6379
           env:
             - name: IS_SLAVE_REDIS
               value: "False"
             - name: REDIS_MAXMEMORY
               value: "1g"
-          image: hub.c.163.com/dwyane/codis-server:2.0
-          ports:
-             - containerPort: 6379
-               name: redis 
 ---
 apiVersion: v1
 kind: ReplicationController
@@ -114,7 +112,11 @@ spec:
         product: "test"
     spec:
       containers:
-        - name: codis-proxy
+        - name: proxy
+          image: hub.c.163.com/dwyane/codis-proxy:2.0
+          ports:
+             - containerPort: 19000
+             - containerPort: 11000
           env:
             - name: ZK_URL
               value: "zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181"
@@ -123,10 +125,4 @@ spec:
             - name: DASHBOARD_IP
               value: "codis-dashboard"
             - name: PROXY_ID
-              value: "proxy-1"
-          image: hub.c.163.com/dwyane/codis-proxy:2.0
-          ports:
-             - containerPort: 19000
-               name: proxy
-             - containerPort: 11000
-               name: http
+              value: "proxy_1"
